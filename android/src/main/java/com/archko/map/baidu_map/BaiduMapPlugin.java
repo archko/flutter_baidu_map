@@ -82,14 +82,19 @@ public class BaiduMapPlugin implements FlutterPlugin, MethodCallHandler, Activit
                     Result result = resultMap.get(String.valueOf(REQUEST_GPS));
 
                     if (resultCode == Activity.RESULT_OK) {
-                        String address = data.getExtras().getString("address");
-                        Log.d(TAG, "data:" + address);
+                        String location = data.getExtras().getString("location");
+                        Log.d(TAG, "data:" + location);
                         if (null != result) {
-                            result.success("address:" + address);
+                            Map map = new HashMap();
+                            map.put("code", 0);
+                            map.put("data", location);
+                            result.success(map);
                         }
                     } else {
                         if (null != result) {
-                            result.error("", "", null);
+                            Map map = new HashMap();
+                            map.put("code", -1);
+                            result.error("error", "error", map);
                         }
                     }
                     resultMap.remove(String.valueOf(REQUEST_GPS));

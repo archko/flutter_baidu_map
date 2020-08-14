@@ -19,6 +19,9 @@ import com.baidu.mapapi.map.BaiduMap.OnMapClickListener;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.search.geocode.*;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class AreaSelectorWithMapActivity extends Activity implements OnMapClickListener,
         OnGetGeoCoderResultListener {
 
@@ -85,7 +88,16 @@ public class AreaSelectorWithMapActivity extends Activity implements OnMapClickL
                 Toast.makeText(AreaSelectorWithMapActivity.this, "请移动地图选址", Toast.LENGTH_LONG).show();
             } else {
                 Intent intent = new Intent();
-                intent.putExtra("address", geoCodeResult.getAddress());
+                JSONObject jo = new JSONObject();
+                try {
+                    jo.put("address", geoCodeResult.getAddress());
+                    jo.put("lat", geoCodeResult.getLocation().latitude);
+                    jo.put("lng", geoCodeResult.getLocation().longitude);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                intent.putExtra("location", jo.toString());
                 setResult(RESULT_OK, intent);
                 finish();
             }
