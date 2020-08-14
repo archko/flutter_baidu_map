@@ -73,8 +73,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> showMap() async {
-    String addr = await BaiduMap.getAddress();
-    _address = addr;
+    Map addr = await BaiduMap.getLocation();
+    _address = addr['address'];
     if (!mounted) return;
     setState(() {});
   }

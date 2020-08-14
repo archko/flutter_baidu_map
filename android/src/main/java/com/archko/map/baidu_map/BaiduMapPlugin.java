@@ -61,7 +61,7 @@ public class BaiduMapPlugin implements FlutterPlugin, MethodCallHandler, Activit
         System.out.println("onMethodCall:" + call.method);
         if (call.method.equals("getPlatformVersion")) {
             result.success("Android " + android.os.Build.VERSION.RELEASE);
-        } else if (call.method.equals("getAddress")) {
+        } else if (call.method.equals("getLocation")) {
             //result.success("Android " + android.os.Build.VERSION.RELEASE);
             if (null != activity) {
                 resultMap.put(String.valueOf(REQUEST_GPS), result);
