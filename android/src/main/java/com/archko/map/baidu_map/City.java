@@ -1,5 +1,7 @@
 package com.archko.map.baidu_map;
 
+import android.text.TextUtils;
+
 import java.io.Serializable;
 
 /**
@@ -11,14 +13,15 @@ public class City implements Serializable {
     public String name;
     public String id;
     public String letter;
+    public String pinyin;
 
     public City() {
     }
 
-    public City(String id, String name, String letter) {
-        this.id = id;
-        this.name = name;
-        this.letter = letter;
+    public void parseFirstLetter() {
+        if (!TextUtils.isEmpty(pinyin)) {
+            letter = pinyin.substring(0, 1).toUpperCase();
+        }
     }
 
     @Override
@@ -27,6 +30,7 @@ public class City implements Serializable {
                 "name='" + name + '\'' +
                 ", id='" + id + '\'' +
                 ", letter='" + letter + '\'' +
+                ", pinyin='" + pinyin + '\'' +
                 '}';
     }
 }

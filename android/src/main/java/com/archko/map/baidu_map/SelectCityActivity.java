@@ -9,10 +9,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.*;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,7 +18,9 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author archko
@@ -38,6 +37,7 @@ public class SelectCityActivity extends Activity {
     View back;
     private ListView cityListView;
     private CityAdapter cityAdapter;
+    private QuickLocationBar mQuicLocationBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +53,10 @@ public class SelectCityActivity extends Activity {
         back.setOnClickListener(v -> {
             finish();
         });
+        mQuicLocationBar = findViewById(R.id.city_loactionbar);
+        mQuicLocationBar.setOnTouchLitterChangedListener(new LetterListViewListener());
+        TextView city_dialog = findViewById(R.id.city_dialog);
+        mQuicLocationBar.setTextDialog(city_dialog);
     }
 
     private void intializeData() {
@@ -68,6 +72,19 @@ public class SelectCityActivity extends Activity {
         loadCityList();
     }
 
+    private class LetterListViewListener implements QuickLocationBar.OnTouchLetterChangedListener {
+
+        @Override
+        public void touchLetterChanged(String s) {
+            Map<String, Integer> alphaIndexer = cityAdapter.getCityMap();
+            if (alphaIndexer.get(s) != null) {
+                int position = alphaIndexer.get(s);
+                cityListView.setSelection(position);
+            }
+        }
+    }
+
+
     protected void setSelectedResult(City city) {
         if (city != null && !TextUtils.isEmpty(city.id)) {
             Intent intent = new Intent();
@@ -81,21 +98,37 @@ public class SelectCityActivity extends Activity {
         private Context context;
         private LayoutInflater layoutInflater;
         private List<City> mData;
+        private Map<String, Integer> alphaIndexer;
 
         public CityAdapter(Context context) {
             this.context = context;
             this.layoutInflater = LayoutInflater.from(context);
             mData = new ArrayList<>();
+            alphaIndexer = new HashMap<String, Integer>();
         }
 
         public List<City> getData() {
             return mData;
         }
 
-        public void setData(List<City> mData) {
-            if (mData != null) {
-                this.mData = mData;
+        public void setData(List<City> list) {
+            mData = list;
+            if (mData == null) {
+                mData = new ArrayList<>();
+                return;
             }
+            for (int i = 0; i < list.size(); i++) {
+                String currentStr = list.get(i).letter;
+                String previewStr = (i - 1) >= 0 ? list.get(i - 1).letter : " ";
+                if (!previewStr.equals(currentStr)) {//前一个首字母与当前首字母不同时加入HashMap中同时显示该字母
+                    String name = list.get(i).letter;
+                    alphaIndexer.put(name, i);
+                }
+            }
+        }
+
+        public Map<String, Integer> getCityMap() {
+            return alphaIndexer;
         }
 
         @Override
@@ -179,6 +212,8 @@ public class SelectCityActivity extends Activity {
         City city = new City();
         city.id = jsonObject.optString("id");
         city.name = jsonObject.optString("name");
+        city.pinyin = jsonObject.optString("py");
+        city.parseFirstLetter();
         return city;
     }
 }

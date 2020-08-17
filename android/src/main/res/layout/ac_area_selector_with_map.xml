@@ -33,6 +33,7 @@
             android:layout_marginLeft="4dp"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:textColor="@android:color/black"
             android:gravity="center_vertical"/>
 
         <TextView
@@ -58,6 +59,7 @@
         android:orientation="horizontal">
 
         <TextView
+            android:layout_marginLeft="4dp"
             android:text="地址:"
             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
         <EditText

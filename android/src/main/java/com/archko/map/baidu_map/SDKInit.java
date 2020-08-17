@@ -9,7 +9,7 @@ import android.util.Log;
 import com.baidu.mapapi.SDKInitializer;
 
 /**
- * @author: wushuyong 2020/8/14 :15:48
+ * @author: archko 2020/8/14 :15:48
  */
 public class SDKInit {
 

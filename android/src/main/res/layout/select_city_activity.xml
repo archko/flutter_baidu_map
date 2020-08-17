@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
     <LinearLayout
         android:id="@+id/back"
@@ -20,8 +20,32 @@
     </LinearLayout>
 
     <ListView
+        android:layout_below="@id/back"
         android:id="@+id/city_list"
         android:dividerHeight="0dp"
         android:scrollbars="none"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
         android:layout_width="match_parent" android:layout_height="match_parent"/>
-</LinearLayout>
+
+    <TextView
+        android:id="@+id/city_dialog"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:layout_centerInParent="true"
+        android:textColor="@color/color_303f9f"
+        android:background="@drawable/bg_text_dialog"
+        android:textSize="30.0sp"
+        android:visibility="gone"/>
+
+    <com.archko.map.baidu_map.QuickLocationBar
+        android:layout_below="@id/back"
+        android:id="@+id/city_loactionbar"
+        android:layout_width="30.0dip"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginBottom="8dp"
+        android:paddingBottom="8dp"/>
+</RelativeLayout>
