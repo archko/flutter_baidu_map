@@ -8,7 +8,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
-    <application>
+    <application
+        android:theme="@style/ajob">
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="bCce5DvdrCuXV81QVP3UvMOCn2Q1Ol3H"/>
@@ -17,5 +18,6 @@
             android:required="false"/>
 
         <activity android:name="com.archko.map.baidu_map.AreaSelectorWithMapActivity"/>
+        <activity android:name="com.archko.map.baidu_map.SelectCityActivity"/>
     </application>
 </manifest>

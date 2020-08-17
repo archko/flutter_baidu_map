@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -73,8 +75,11 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> showMap() async {
-    Map addr = await BaiduMap.getLocation();
-    _address = addr['address'];
+    Map<String, dynamic> addr = await BaiduMap.getLocation();
+    print("addr:$addr");
+    Map<String, dynamic> data = jsonDecode(addr['data']);
+    print("data:$data");
+    _address = data['address'];
     if (!mounted) return;
     setState(() {});
   }

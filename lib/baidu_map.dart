@@ -25,8 +25,8 @@ class BaiduMap {
     return version;
   }
 
-  static Future<Map> getLocation() async {
-    final Map address = await invokeMapMethod('getLocation');
+  static Future<Map<String, dynamic>> getLocation() async {
+    final Map<String, dynamic> address = await invokeMapMethod('getLocation');
     //{code: 0, data: {"address":"北京市东城区广场西侧路","lat":39.91108923635131,"lng":116.40275584463448}}
     print("getLocation:$address");
     return address;

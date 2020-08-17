@@ -8,10 +8,9 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.archko.map.baidu_map.R;
 
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.*;
@@ -29,30 +28,17 @@ public class AreaSelectorWithMapActivity extends Activity implements OnMapClickL
         context.startActivity(new Intent(context, AreaSelectorWithMapActivity.class));
     }
 
-    TextView map_address;
+    View back;
+    EditText map_address;
     View btn_save;
+    View city_layout;
+    TextView city_txt;
     //百度地图相关
-    /**
-     * 百度地图的View
-     */
     private MapView mMapView;
-    /**
-     * 百度地图控制器
-     */
     private BaiduMap mBaiduMap;
-    /**
-     * 地图覆盖物
-     */
-    //private MarkerOptions mOption;
-    //private MarkerOptions mTipMarkerOption;
-    /**
-     * 地图地理编码信息转换
-     */
     private GeoCoder mSearch;
     private ReverseGeoCodeOption mReverseGeoCodeOption;
-    /**
-     * 百度地图SDK广播接受者判断key是否有效
-     */
+    //百度地图SDK广播接受者判断key是否有效
     private SDKReceiver mReceiver;
 
     private boolean requestMoveCenter;
@@ -60,9 +46,6 @@ public class AreaSelectorWithMapActivity extends Activity implements OnMapClickL
     ReverseGeoCodeResult geoCodeResult;
     LatLng latLng;
 
-    /**
-     * @param savedInstanceState
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,7 +57,10 @@ public class AreaSelectorWithMapActivity extends Activity implements OnMapClickL
     }
 
     private void initializeView() {
-        map_address = findViewById(R.id.map_address);
+        back = findViewById(R.id.back);
+        city_layout = findViewById(R.id.city_layout);
+        city_txt = findViewById(R.id.city_txt);
+        map_address = findViewById(R.id.address_txt);
         btn_save = findViewById(R.id.btn_save);
         mMapView = findViewById(R.id.mapview);
         mBaiduMap = mMapView.getMap();
@@ -83,14 +69,18 @@ public class AreaSelectorWithMapActivity extends Activity implements OnMapClickL
         mReverseGeoCodeOption = new ReverseGeoCodeOption();
         initBaiduMap();
 
+        back.setOnClickListener(v -> {
+            finish();
+        });
         btn_save.setOnClickListener(v -> {
             if (null == geoCodeResult) {
                 Toast.makeText(AreaSelectorWithMapActivity.this, "请移动地图选址", Toast.LENGTH_LONG).show();
             } else {
+                String address = map_address.getText().toString();
                 Intent intent = new Intent();
                 JSONObject jo = new JSONObject();
                 try {
-                    jo.put("address", geoCodeResult.getAddress());
+                    jo.put("address", address);
                     jo.put("lat", geoCodeResult.getLocation().latitude);
                     jo.put("lng", geoCodeResult.getLocation().longitude);
                 } catch (JSONException e) {
@@ -101,6 +91,9 @@ public class AreaSelectorWithMapActivity extends Activity implements OnMapClickL
                 setResult(RESULT_OK, intent);
                 finish();
             }
+        });
+        city_layout.setOnClickListener(v -> {
+            SelectCityActivity.start(AreaSelectorWithMapActivity.this);
         });
     }
 
@@ -178,7 +171,8 @@ public class AreaSelectorWithMapActivity extends Activity implements OnMapClickL
         if (geoCodeResult.getLocation() == null || mBaiduMap == null) {
             return;
         }
-        StringBuffer sb = new StringBuffer();
+        System.out.println("city:" + geoCodeResult.getCityCode());
+        StringBuilder sb = new StringBuilder();
         sb.append("地址反查结果：[");
         sb.append(geoCodeResult.getLocation().latitude);
         sb.append(",");
@@ -198,22 +192,19 @@ public class AreaSelectorWithMapActivity extends Activity implements OnMapClickL
         if (null == mBaiduMap || TextUtils.isEmpty(tip) || null == latLng) {
             return;
         }
-        try {
-            map_address.setText(String.format("选中的位置：%s", tip));
-            mBaiduMap.clear();
-            if (requestMoveCenter) {
-                //移动地图中心点
-                mBaiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(latLng));
-                requestMoveCenter = false;
-            }
-            //百度地图提示TextView
-            TextView mTipText = new TextView(getApplicationContext());
-            mTipText.setBackgroundResource(R.drawable.bg_map_tip);
-            mTipText.setText(tip);
-            // 覆盖物(#addMapMarker)
-            mBaiduMap.showInfoWindow(new InfoWindow(mTipText, latLng, -47));
-        } catch (NullPointerException e) {
+        map_address.setText(tip);
+        mBaiduMap.clear();
+        if (requestMoveCenter) {
+            //移动地图中心点
+            mBaiduMap.setMapStatus(MapStatusUpdateFactory.newLatLng(latLng));
+            requestMoveCenter = false;
         }
+        //百度地图提示TextView
+        TextView mTipText = new TextView(getApplicationContext());
+        mTipText.setBackgroundResource(R.drawable.bg_map_tip);
+        mTipText.setText(tip);
+        // 覆盖物(#addMapMarker)
+        mBaiduMap.showInfoWindow(new InfoWindow(mTipText, latLng, -47));
     }
 
     @Override
@@ -240,6 +231,29 @@ public class AreaSelectorWithMapActivity extends Activity implements OnMapClickL
     protected void onPause() {
         super.onPause();
         mMapView.onPause();
+    }
+
+    @Override
+    protected void onActivityResult(int reqeustCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            if (reqeustCode == SelectCityActivity.REQUEST_CODE) {
+                City city = (City) data.getSerializableExtra(SelectCityActivity.EXTRA_KEY_OUT);
+                afterSelectCity(city);
+            }
+        }
+    }
+
+    private void afterSelectCity(City city) {
+        if (city != null) {
+            city_txt.setText(city.name);
+            if (mSearch != null) {
+                requestMoveCenter = true;
+                GeoCodeOption geo = new GeoCodeOption();
+                geo.address(city.name);
+                geo.city(city.name);
+                mSearch.geocode(geo);
+            }
+        }
     }
 
     /**
