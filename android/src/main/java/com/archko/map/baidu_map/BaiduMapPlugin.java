@@ -62,7 +62,6 @@ public class BaiduMapPlugin implements FlutterPlugin, MethodCallHandler, Activit
         if (call.method.equals("getPlatformVersion")) {
             result.success("Android " + android.os.Build.VERSION.RELEASE);
         } else if (call.method.equals("getLocation")) {
-            //result.success("Android " + android.os.Build.VERSION.RELEASE);
             if (null != activity) {
                 resultMap.put(String.valueOf(REQUEST_GPS), result);
                 Intent intent = new Intent(activity, AreaSelectorWithMapActivity.class);
@@ -107,16 +106,17 @@ public class BaiduMapPlugin implements FlutterPlugin, MethodCallHandler, Activit
 
     @Override
     public void onDetachedFromActivityForConfigChanges() {
-
+        activity = null;
     }
 
     @Override
-    public void onReattachedToActivityForConfigChanges(ActivityPluginBinding activityPluginBinding) {
-
+    public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
+        activity = binding.getActivity();
     }
 
     @Override
     public void onDetachedFromActivity() {
+        activity = null;
     }
 
     @Override
